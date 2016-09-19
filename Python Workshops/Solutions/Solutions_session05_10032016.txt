@@ -1,0 +1,59 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar 04 18:35:21 2016
+
+@author: Kane
+"""
+df = pd.read_csv("titanic.csv")
+df.head(10)
+df.describe()
+df.info()
+df.loc[57]
+df.sum()
+
+df['Embarked'] = df['Embarked'].fillna('S')
+df.loc[df['Embarked'] == 'S', 'Embarked'] = 'Southampton'
+df.loc[df['Embarked'] == 'C', 'Embarked'] = 'Cherbourg'
+df.loc[df['Embarked'] == 'Q', 'Embarked'] = 'Queenstown'
+df.to_csv('embarked.csv')
+
+sns.factorplot('Embarked',data=df,kind='count')
+sns.factorplot('Embarked',data=df, hue = 'Pclass',kind='count')
+
+df.loc[df['Age'] > 60]
+
+def man_woman_child(passenger):
+    age, sex = passenger
+    if age < 16:
+        return "C"
+    if age > 60:
+        return "E"
+    else:
+        return sex
+
+df["who"] = df[["Age", "Sex"]].apply(man_woman_child, axis=1)
+
+pal = {'C': '#2E8B57', 'F': '#F08080', 'M': '#6495ED', 'E' : '#f4f486'}
+sns.factorplot("who", data=df, palette=pal, kind = "count");
+
+def wealthyAndOld(passenger):
+    age, fare = passenger
+    if age > 50 and fare > 30:
+        return 'Rich and old'
+    else:
+        return 'Normal'
+df['wealthy_old'] = df[['Age','Fare']].apply(wealthyAndOld,axis=1)
+df.loc[wealthy_old == 'Rich and old']
+
+sns.factorplot("deck", "Age", data=df, palette="PuBu_d", kind = "bar", order = deckOrder);
+sns.factorplot("deck", "Age", data=df, palette="PuBu_d", kind = "box", order = deckOrder);
+B = df.loc[df.deck == 'B']
+B.describe()
+
+sns.factorplot("deck", hue="Pclass", data=df, palette="BuPu_d", kind = "count", order = deckOrder); 
+sns.factorplot("deck", hue="who", data=df, palette="BuPu_d", kind = "count", order = deckOrder);
+
+sns.factorplot("who","Survived", data=df, ci = 0).set(ylim=(0, 1));
+sns.factorplot("deck", "Survived", hue = 'Sex',data=df, order = deckOrder,ci = 0).set(ylim=(0, 1));
+sns.factorplot("wealthy_old","Survived",data=df, ci = 0).set(ylim=(0, 1));
+sns.factorplot("wealthy_old","Survived",data=df, hue = 'Sex',ci = 0).set(ylim=(0, 1));
